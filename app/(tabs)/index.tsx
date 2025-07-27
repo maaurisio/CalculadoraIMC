@@ -1,75 +1,90 @@
-import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+import { useState } from 'react';
+import { Button, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function HomeScreen() {
+  const [peso, setPeso] = useState('');
+  const [estatura, setEstatura] = useState('');
+  const [resultado, setResultado] = useState('');
+  const [mensaje, setMensaje] = useState('');
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <View style={styles.container}>
+      <Text style={styles.titulo}>TITULO</Text>
+      <TextInput
+        style={styles.caja}
+        value={peso}
+        onChangeText={(valorPeso) => {
+          setPeso(valorPeso);
+        }}
+        placeholder='Ingrese su Peso (kg)'
+        keyboardType='numeric'
+      />
+      <TextInput
+        style={styles.caja}
+        value={estatura}
+        onChangeText={(valorEstatura) => {
+          setEstatura(valorEstatura)
+        }}
+        placeholder='Ingrese su Estatura'
+        keyboardType='numeric'
+      />
+      <View style={styles.contenedorBoton}>
+        <Button
+          title='CALCULAR'
+          onPress={() => {
+            let pesoFloat = parseFloat(peso);     // Usa parseFloat para precisión decimal
+            let estaturaFloat = parseFloat(estatura);
+
+            if (isNaN(pesoFloat) || isNaN(estaturaFloat)) {
+              setResultado("Por favor ingrese valores válidos");
+              return;
+            }
+
+            const imc = pesoFloat / (estaturaFloat * estaturaFloat);
+            const imcRedondeado = imc.toFixed(2); // Redondear a 2 decimales
+
+            setResultado('su IMC es: ' + imcRedondeado);
+
+            if (imc < 18.5) {
+              setMensaje('tiene un peso menor al normal');
+            } else if (imc > 18.5 && imc < 25.0) {
+              setMensaje('su peso es normal');
+            }
+            else if (imc > 25.0 && imc < 30.0) {
+              setMensaje('su peso es superior al normal');
+            } else {
+              setMensaje('tiene obesidad')
+            }
+          }}
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+      </View>
+      <Text>{resultado}, {mensaje}</Text>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    paddingHorizontal: 10,
+  },
+  caja: {
+    borderColor: 'gray',
+    borderWidth: 1,
+    paddingTop: 2,
+    paddingHorizontal: 5,
+    marginTop: 3,
+  },
+  titulo: {
+    fontSize: 16,
+    marginBottom: 5,
+  },
+  contenedorBoton: {
     alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    margin: 10,
   },
 });
